@@ -287,7 +287,10 @@ function renderPagos(q){
 // ── TABLERO ──────────────────────────────────
 const PALETA=['#5aa469','#4a90d9','#e8943a','#9b59b6','#e05a4d','#1abc9c',
               '#f1c40f','#e07ba8','#5d6d9a','#a1887f','#95a5a6'];
-const KPI_MONEDA=new Set(['Pendiente','Facturado del mes','Cobrado del mes']);
+const KPI_MONEDA=new Set(['Pendiente','Facturado del mes','Cobrado del mes','Honorario promedio']);
+// Reetiquetados SOLO en la web (el escritorio mantiene los nombres originales).
+const TITULOS_WEB={'Por tipo de terapia':'Por tipo de clase'};
+const ETIQUETAS_WEB={'Por origen':{'Paciente':'Alumnos'}};
 
 function svgTorta(items){
   const total=items.reduce((s,d)=>s+d.valor,0);
@@ -348,9 +351,12 @@ function renderTablero(){
     html+='</div>';
   }
   orden.filter(s=>s!=='kpi').forEach(s=>{
+    const titulo=TITULOS_WEB[s]||s;
+    const mapa=ETIQUETAS_WEB[s]||{};
+    const items=grupos[s].map(d=>({etiqueta:(mapa[d.etiqueta]||d.etiqueta),valor:d.valor}));
     html+='<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:14px 16px;margin-bottom:12px;box-shadow:var(--shadow)">'+
-      '<div style="font-weight:600;font-size:14px;margin-bottom:10px">'+s+'</div>'+
-      svgTorta(grupos[s])+'</div>';
+      '<div style="font-weight:600;font-size:14px;margin-bottom:10px">'+titulo+'</div>'+
+      svgTorta(items)+'</div>';
   });
   cont.innerHTML=html;
 }
